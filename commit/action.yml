@@ -17,6 +17,10 @@ inputs:
     description: 'Message to log for this commit'
     required: false
     default: 'Regenerate build artifacts.'
+  batchMaxFiles:
+    description: 'Maximum number of files in each commit'
+    required: false
+    default: '0'
 runs:
   using: 'composite'
   steps:
@@ -26,3 +30,4 @@ runs:
       DEBUG: ${{ inputs.debug }}git
       WD_PATH: ${{ inputs.wdPath }}
       COMMIT_MESSAGE: ${{ inputs.commitMessage }} 
+      BATCH_MAX_FILES: ${{ inputs.batchMaxFiles }}

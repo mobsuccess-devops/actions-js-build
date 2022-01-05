@@ -35,14 +35,74 @@ git_setup ( ) {
   git config user.name "$GITHUB_ACTOR"
 }
 
+# Batch delete/add files up to a maximum limit
+git_batch ( ) {
+  commitpush() {
+    git commit -m "$COMMIT_MESSAGE"
+    git push
+  }
+
+  # remove deleted files
+  deletedFiles=()
+  purgeDeletedFiles ( ) {
+    git rm "${deletedFiles[@]}"
+    commitpush
+    deletedFiles=()
+  }
+  pushDeletedFile ( ) {
+    deletedFiles+=("$1")
+    if [ ${#deletedFiles[@]} -ge $BATCH_MAX_FILES ]; then
+      purgeDeletedFiles
+    fi
+  }
+  IFS=""
+  while read -r -d $'\0' line; do
+    IFS="\0";
+    set -- $line
+    pushDeletedFile "${line:3}"
+    IFS=""
+  done < <(git status -u --porcelain -z | grep -z '^\( D\)')
+  if [ ${#deletedFiles[@]} -gt 0 ]; then
+    purgeDeletedFiles
+  fi
+
+  # add missing files
+  addFiles=()
+  purgeAddFiles ( ) {
+    git add "${addFiles[@]}"
+    commitpush
+    addFiles=()
+  }
+  pushAddFile ( ) {
+    addFiles+=("$1")
+    if [ ${#addFiles[@]} -ge $BATCH_MAX_FILES ]; then
+      purgeAddFiles
+    fi
+  }
+  IFS=""
+  while read -r -d $'\0' line; do
+    IFS="\0";
+    set -- $line
+    pushAddFile "${line:3}"
+    IFS=""
+  done < <(git status -u --porcelain -z)
+  if [ ${#addFiles[@]} -gt 0 ]; then
+    purgeAddFiles
+  fi
+}
+
 # This section only runs if there have been file changes
 echo "Checking for uncommitted changes in the git working tree."
 if expr $(git status --porcelain | wc -l) \> 0
 then 
   git_setup
-  git add .
-  git commit -m "$COMMIT_MESSAGE"
-  git push
+  if expr "$BATCH_MAX_FILES" \> 0; then
+    git_batch
+  else
+    git add .
+    git commit -m "$COMMIT_MESSAGE"
+    git push
+  fi
 else 
   echo "Working tree clean. Nothing to commit."
 fi

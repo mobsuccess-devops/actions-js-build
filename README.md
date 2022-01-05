@@ -39,6 +39,12 @@ jobs:
       uses: elstudio/actions-js-build/commit@v4
       with:
         commitMessage: Regenerate css 
+
+    - name: Batch Commit changes
+      uses: elstudio/actions-js-build/commit@v4
+      with:
+        commitMessage: Automatic update
+        batchMaxFiles: 1000
 ```
 
 
@@ -46,3 +52,4 @@ jobs:
 ### Inputs
 
 * `wdPath` - **Optional**. To specify a directory other than the repository root where NPM's Package.json and either gulpfile.js or Gruntfile.js may be found.
+* `batchMaxFiles` - **Optional**. If you have too many files to update and you exceed the maximum GitHub pack size, set this argument to commit your files in batches.
