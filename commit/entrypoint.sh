@@ -25,7 +25,7 @@ fi
 echo Test failure
 false
 echo Test failure 2
-exit
+exit 1
 
 # If WD_PATH is defined, then cd to it
 if [ ! -z "$WD_PATH" ]
