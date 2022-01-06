@@ -22,6 +22,11 @@ else
   export ACTIONS_STEP_DEBUG=true
 fi
 
+echo Test failure
+false
+echo Test failure 2
+exit
+
 # If WD_PATH is defined, then cd to it
 if [ ! -z "$WD_PATH" ]
 then
