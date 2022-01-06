@@ -15,11 +15,9 @@ if [ "$DEBUG" == "false" ]
 then
   # Carry on, but do quit on errors
   set -e
-  echo DEBUG OFF
 else
   # Verbose debugging
   # set -exuo pipefail
-  echo DEBUG ON
   export LOG_LEVEL=debug
   export ACTIONS_STEP_DEBUG=true
 fi

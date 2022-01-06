@@ -27,7 +27,7 @@ runs:
   - run: ${{ github.action_path }}/entrypoint.sh
     shell: bash
     env:
-      DEBUG: ${{ inputs.debug }}git
+      DEBUG: ${{ inputs.debug }}
       WD_PATH: ${{ inputs.wdPath }}
       COMMIT_MESSAGE: ${{ inputs.commitMessage }} 
       BATCH_MAX_FILES: ${{ inputs.batchMaxFiles }}
