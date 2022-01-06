@@ -9,6 +9,7 @@
 ## Optional environment variables:
 ## - $WD_PATH: Working directory to CD into before checking for changes
 ## - $PUSH_BRANCH: Remote branch to push changes to
+## - $BATCH_MAX_FILES: Maximum number of files to commit at one time
 
 if [ "$DEBUG" == "false" ]
 then
@@ -35,7 +36,11 @@ git_setup ( ) {
   git config user.name "$GITHUB_ACTOR"
 }
 
-# Batch delete/add files up to a maximum limit
+echo "Received BATCH_MAX_FILES=$BATCH_MAX_FILES"
+BATCH_MAX_FILES=$((BATCH_MAX_FILES+0))
+echo "Using BATCH_MAX_FILES=$BATCH_MAX_FILES"
+
+# Batch remove/add files up to a maximum limit
 git_batch ( ) {
   commitpush() {
     git commit -m "$COMMIT_MESSAGE"
@@ -43,27 +48,30 @@ git_batch ( ) {
   }
 
   # remove deleted files
-  deletedFiles=()
-  purgeDeletedFiles ( ) {
-    git rm "${deletedFiles[@]}"
+  removeFiles=()
+  purgeRemoveFiles ( ) {
+    git rm "${removeFiles[@]}"
     commitpush
-    deletedFiles=()
+    removeFiles=()
   }
-  pushDeletedFile ( ) {
-    deletedFiles+=("$1")
-    if [ ${#deletedFiles[@]} -ge $BATCH_MAX_FILES ]; then
-      purgeDeletedFiles
+  pushRemoveFile ( ) {
+    removeFiles+=("$1")
+    countRemoveFiles=${#removeFiles[@]}
+    echo "Debug count: $countRemoveFiles -ge $BATCH_MAX_FILES"
+    if [ "$countRemoveFiles" -ge "$BATCH_MAX_FILES" ]; then
+      purgeRemoveFiles
     fi
   }
   IFS=""
   while read -r -d $'\0' line; do
     IFS="\0";
     set -- $line
-    pushDeletedFile "${line:3}"
+    pushRemoveFile "${line:3}"
     IFS=""
   done < <(git status -u --porcelain -z | grep -z '^\( D\)')
-  if [ ${#deletedFiles[@]} -gt 0 ]; then
-    purgeDeletedFiles
+  countRemoveFiles=${#removeFiles[@]}
+  if [ "countRemoveFiles" -gt 0 ]; then
+    purgeRemoveFiles
   fi
 
   # add missing files
@@ -75,7 +83,9 @@ git_batch ( ) {
   }
   pushAddFile ( ) {
     addFiles+=("$1")
-    if [ ${#addFiles[@]} -ge $BATCH_MAX_FILES ]; then
+    countAddFiles=${#addFiles[@]}
+    echo "Debug count: $countAddFiles -ge $BATCH_MAX_FILES"
+    if [ "$countAddFiles" -ge "$BATCH_MAX_FILES" ]; then
       purgeAddFiles
     fi
   }
@@ -86,7 +96,8 @@ git_batch ( ) {
     pushAddFile "${line:3}"
     IFS=""
   done < <(git status -u --porcelain -z)
-  if [ ${#addFiles[@]} -gt 0 ]; then
+  countAddFiles=${#addFiles[@]}
+  if [ "$countAddFiles" -gt 0 ]; then
     purgeAddFiles
   fi
 }
