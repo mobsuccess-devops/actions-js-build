@@ -15,9 +15,11 @@ if [ "$DEBUG" == "false" ]
 then
   # Carry on, but do quit on errors
   set -e
+  echo DEBUG OFF
 else
   # Verbose debugging
   # set -exuo pipefail
+  echo DEBUG ON
   export LOG_LEVEL=debug
   export ACTIONS_STEP_DEBUG=true
 fi
@@ -36,9 +38,7 @@ git_setup ( ) {
   git config user.name "$GITHUB_ACTOR"
 }
 
-echo "Received BATCH_MAX_FILES=$BATCH_MAX_FILES"
 BATCH_MAX_FILES=$((BATCH_MAX_FILES+0))
-echo "Using BATCH_MAX_FILES=$BATCH_MAX_FILES"
 
 # Batch remove/add files up to a maximum limit
 git_batch ( ) {
