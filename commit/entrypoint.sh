@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ## This GitHub Action for git commits any changed files and pushes 
 ## those changes back to the origin repository.
 ##
