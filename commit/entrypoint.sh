@@ -93,10 +93,11 @@ git_batch ( ) {
 
 # This section only runs if there have been file changes
 echo "Checking for uncommitted changes in the git working tree."
-if expr $(git status --porcelain | wc -l) \> 0
+if expr $(git status --porcelain | wc -l) \> 0 >/dev/null
 then 
   git_setup
-  if expr "$BATCH_MAX_FILES" \> 0; then
+  if expr "$BATCH_MAX_FILES" \> 0 >/dev/null
+  then
     git_batch
   else
     git add .
