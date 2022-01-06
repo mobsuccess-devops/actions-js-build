@@ -23,7 +23,8 @@ else
 fi
 
 echo Test failure
-false
+> .git/config
+git push
 echo Test failure 2
 exit 1
 
