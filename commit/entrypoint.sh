@@ -57,7 +57,6 @@ git_batch ( ) {
   pushRemoveFile ( ) {
     removeFiles+=("$1")
     countRemoveFiles=${#removeFiles[@]}
-    echo "Debug count: $countRemoveFiles -ge $BATCH_MAX_FILES"
     if [ "$countRemoveFiles" -ge "$BATCH_MAX_FILES" ]; then
       purgeRemoveFiles
     fi
@@ -84,7 +83,6 @@ git_batch ( ) {
   pushAddFile ( ) {
     addFiles+=("$1")
     countAddFiles=${#addFiles[@]}
-    echo "Debug count: $countAddFiles -ge $BATCH_MAX_FILES"
     if [ "$countAddFiles" -ge "$BATCH_MAX_FILES" ]; then
       purgeAddFiles
     fi
