@@ -71,7 +71,7 @@ git_batch ( ) {
     set -- $line
     pushRemoveFile "${line:3}"
     IFS=""
-  done < <(git status -u --porcelain -z | grep -z '^\( D\)')
+  done < <((git status -u --porcelain -z | grep -z '^\( D\)') || kill $$)
   countRemoveFiles=${#removeFiles[@]}
   if [ "countRemoveFiles" -gt 0 ]; then
     purgeRemoveFiles
@@ -97,7 +97,7 @@ git_batch ( ) {
     set -- $line
     pushAddFile "${line:3}"
     IFS=""
-  done < <(git status -u --porcelain -z)
+  done < <(git status -u --porcelain -z || kill $$)
   countAddFiles=${#addFiles[@]}
   if [ "$countAddFiles" -gt 0 ]; then
     purgeAddFiles
