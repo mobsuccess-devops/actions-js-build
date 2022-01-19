@@ -65,7 +65,7 @@ git_batch ( ) {
     set -- $line
     pushRemoveFile "${line:3}"
     IFS=""
-  done < <((git status -u --porcelain -z | grep -z '^\( D\)') || kill $$)
+  done < <((git status -u --porcelain -z | (grep -z '^\( D\)' || true)) || kill $$)
   countRemoveFiles=${#removeFiles[@]}
   if [ "countRemoveFiles" -gt 0 ]; then
     purgeRemoveFiles
