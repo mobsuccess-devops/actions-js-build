@@ -100,6 +100,7 @@ git_batch ( ) {
 
 # This section only runs if there have been file changes
 echo "Checking for uncommitted changes in the git working tree."
+set -ecxv
 if expr $(git status --porcelain | wc -l) \> 0 >/dev/null
 then 
   git_setup
